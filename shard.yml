@@ -1,0 +1,9 @@
+name: search
+version: 0.2.0
+
+authors:
+  - Mehmet Celik <mehmet@celik.be>
+
+crystal: 0.27.2
+
+license: MIT
