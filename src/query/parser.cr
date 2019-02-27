@@ -44,6 +44,7 @@ module Query
       "atoz",
       "user",
       "sresource_type",
+      "genre",
     ]
 
     enum MatchType
@@ -89,7 +90,12 @@ module Query
       def to_s
         terms_s = ""
         @terms.each do |term|
-          terms_s += " " if terms_s.size > 0
+          if @terms.last == term && term.type == TermType::Operator
+            terms_s += "," if terms_s.size > 0
+          else
+            terms_s += " " if terms_s.size > 0
+          end
+
           terms_s += term.to_s
         end
 
@@ -140,13 +146,31 @@ module Query
         raise "query error: brackets do not match"
       end
 
-      queries
+      collapse_if_exact_match(queries)
     end
 
     private def extract_brackets_from_token(token)
       brackets = Bracket.new((token.match(/(^\(*)/) || ["", ""])[1], (token.match(/(\)*$)/) || ["", ""])[1])
       token = token.gsub(/(^\(*)/, "").gsub(/(\)*$)/, "")
       return brackets, token
+    end
+
+    private def collapse_if_exact_match(queries : Array(Query))
+      new_queries = [] of Query
+      queries.each do |query|
+        if query.terms.first.value =~ /^["|']/ && query.terms.last.value =~ /["|']$/
+          new_queries << Query.new(index: query.index,
+            match: MatchType::Exact,
+            terms: [Term.new(TermType::Term,
+                      query.terms.map { |m| m.value }.join(" "),
+                      Bracket.new("", ""))]
+          )
+        else
+          new_queries << query
+        end
+      end
+
+      new_queries
     end
 
     private def cleanup_query_term(terms = [] of Term)

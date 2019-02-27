@@ -1,4 +1,4 @@
-require "search/engines/primo_search"
+require "./search/engines/primo_search"
 
 module Search
   VERSION = "0.2.0"
