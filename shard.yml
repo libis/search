@@ -1,9 +1,13 @@
 name: search
 version: 0.3.0
 
+dependencies:
+  logger:
+    github: crystal-lang/logger.cr
+
 authors:
   - Mehmet Celik <mehmet@celik.be>
 
-crystal: 0.27.2
+crystal: 1.2.2
 
 license: MIT

@@ -14,7 +14,7 @@ class GenericSearch
   end
 
   def each
-    puts "to be implemented"
+    yield "to be implemented"
   end
 
   def size
