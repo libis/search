@@ -114,7 +114,7 @@ class PrimoSearch < GenericSearch
       if lk.is_a?(Hash)
         k = lk.fetch(inst.downcase, "source_id")
       else
-        k = lk.as_s
+        k = lk
       end
     end
 
