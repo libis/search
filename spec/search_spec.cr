@@ -4,7 +4,8 @@ describe Search do
   # TODO: Write tests
 
   it "should parse query" do
-    qp = Query::Parser.new
+    ps = PrimoSearch.new(config_file: "./spec/config.json")
+    qp = Query::Parser.new(ps.index_map)
 
     parsed = qp.parse("pre_filter:(images OR books) AND title:postkaart OR subject:^postkaart")
 
@@ -15,7 +16,8 @@ describe Search do
   end
 
   it "should parse query" do
-    qp = Query::Parser.new
+    ps = PrimoSearch.new(config_file: "./spec/config.json")
+    qp = Query::Parser.new(ps.index_map)
 
     parsed = qp.parse("title:'wandering earth'")
     #pp parsed
@@ -24,8 +26,20 @@ describe Search do
     stringified[0].should eq "title,exact,'wandering earth'"
   end
 
+
+  it "should parse query" do
+    ps = PrimoSearch.new(config_file: "./spec/config.json")
+    qp = Query::Parser.new(ps.index_map)
+
+    parsed = qp.parse("user:U0011315 year:[2010 TO 2022]")
+    
+    stringified = parsed.map{|m| m.to_s}
+    stringified[0].should eq "user,contains,U0011315"
+    stringified[1].should eq "user,contains,U0011315"
+  end
+
   it "should build an url, default options" do
-    puts Dir.current
+    
     ps = PrimoSearch.new(config_file: "./spec/config.json")
     url, inst, offset, limit = ps.build_url("title:'wandering earth'")
 
@@ -35,8 +49,7 @@ describe Search do
     limit.should eq "10"
   end
 
-  it "should build an url, with an offset of 10" do
-    puts Dir.current
+  it "should build an url, with an offset of 10" do    
     ps = PrimoSearch.new(config_file: "./spec/config.json")
 
     url, inst, offset, limit = ps.build_url("title:'wandering earth'", {"from" => "10", "step" => "1"})
@@ -46,7 +59,7 @@ describe Search do
   end
 
   it "should execute a query" do
-    puts Dir.current
+    
     ps = PrimoSearch.new(config_file: "./spec/config.json")
 
     result = ps.query("title:'wandering earth'", {"step" => "1"})

@@ -13,40 +13,6 @@ end
 
 module Query
   class Parser
-    @index_map = [
-      "acq_date",
-      "acq_local",
-      "acq_tag",
-      "acq_method",
-      "acq_source",
-      "any",
-      "lang",
-      "author",
-      "available_in",
-      "callnumber",
-      "category_type",
-      "collection",
-      "isbn",
-      "issn",
-      "library",
-      "resource_type",
-      "pre_filter",
-      "scope",
-      "source",
-      "subject",
-      "sys",
-      "tag",
-      "title",
-      "topic",
-      "toplevel",
-      "year",
-      "vcollection",
-      "atoz",
-      "user",
-      "sresource_type",
-      "genre",
-    ]
-
     enum MatchType
       Contains
       BeginsWith
@@ -103,7 +69,7 @@ module Query
       end
     end
 
-    def initialize
+    def initialize(@index_map = {} of String => Hash(String, String) | String)
       @open_bracket = 0
       @close_bracket = 0
     end
@@ -115,6 +81,8 @@ module Query
 
       query = Query.new(index: "any", match: MatchType::Contains, terms: [] of Term)
       tokens.each do |token|
+        next if token.blank?
+        
         if is_index?(token)
           if @open_bracket == @close_bracket
             query.terms = cleanup_query_term(query.terms)
@@ -149,8 +117,9 @@ module Query
       collapse_if_exact_match(queries)
     end
 
-    private def extract_brackets_from_token(token)
+    private def extract_brackets_from_token(token)      
       brackets = Bracket.new((token.match(/(^\(*)/) || ["", ""])[1], (token.match(/(\)*$)/) || ["", ""])[1])
+      #brackets = Bracket.new((token.match(/(^\(*)/) || ["", ""])[1], (token.match(/(\)*$)/) || ["", ""])[1])
       token = token.gsub(/(^\(*)/, "").gsub(/(\)*$)/, "")
       return brackets, token
     end
@@ -214,6 +183,8 @@ module Query
         return @index_map.includes?(possible_index.rchop)
       end
       return false
+    rescue e
+      return false
     end
 
     private def is_term?(possible_term)
@@ -223,11 +194,15 @@ module Query
       @open_bracket += possible_term.scan(/\(|\[|\"|\"/).size || 0
       @close_bracket += possible_term.scan(/\)|\]|\"|\"/).size || 0
       return true
+    rescue e
+      return false      
     end
 
     private def is_operator?(possible_operator)
       operators = %w(AND OR NOT)
       operators.includes?(possible_operator)
+    rescue e
+      return false      
     end
   end
 end

@@ -1,5 +1,6 @@
 require "./generic_search"
 require "uri"
+require "json"
 
 class PrimoSearch < GenericSearch    
 
@@ -7,38 +8,38 @@ class PrimoSearch < GenericSearch
   end
   
   def config
-    JSON.parse(File.read(@config_file))["engines"]["primo"].as_h
+    Hash(String, Hash(String, Hash(String, Hash(String, String | Hash(String, String))) ) ).from_json(File.read(@config_file))["engines"]["primo"]
   rescue e
     raise "Unable to load or parse config.json"
   end
 
   def lds_mapping
-    config["local_display"].as_h
+    config["local_display"]
   end
 
   def index_map
-    config["index"].as_h
+    config["index"]
   rescue e
     raise "Unable to get index_map from config.json"
   end
 
   def avail_inst
-    config["institution"].as_h
+    config["institution"]
   end
 
   def alma
-    config["alma"].as_h
+    config["alma"]
   end
 
 
   def build_url(q, options = {} of String => String)
     query = ""
     facet = ""
-    query_parser = Query::Parser.new
+    query_parser = Query::Parser.new(index_map)
     parsed_query = query_parser.parse(q)
     
     parsed_query.each do |pq|
-      pq.index = index_map[pq.index].as_s
+      pq.index = index_map[pq.index].to_s
       if pq.index =~ /^facet/
         facet += "," if facet.size > 0
         facet += "#{pq.index},exact,#{pq.terms.map { |m| m.to_s }.join(" ")}"
