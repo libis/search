@@ -126,8 +126,6 @@ class PrimoSearch < GenericSearch
       end
     end
 
-    puts "----> #{k}"
-
     k
   end
 
