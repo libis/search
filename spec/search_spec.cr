@@ -25,17 +25,20 @@ describe Search do
   end
 
   it "should build an url, default options" do
-    ps = PrimoSearch.new
+    puts Dir.current
+    ps = PrimoSearch.new(config_file: "./spec/config.json")
     url, inst, offset, limit = ps.build_url("title:'wandering earth'")
 
-    url.should eq "https://api-eu.hosted.exlibrisgroup.com/primo/v1/search?q=title%2Cexact%2C%27wandering%20earth%27&offset=0&limit=10&inst=KUL&vid=KULeuven&tab=all_content_tab&scope=ALL_CONTENT&sort=rank&apikey=l7xxaa2ca915ae4d46e299c9ca4348f179a8"
+    url.should eq "https://#{ps.alma["host"]}/primo/v1/search?q=title%2Cexact%2C%27wandering%20earth%27&offset=0&limit=10&inst=KUL&vid=KULeuven&tab=all_content_tab&scope=ALL_CONTENT&sort=rank&apikey=#{ps.alma["apikey"]}"
     inst.should eq "KUL"
     offset.should eq "0"
     limit.should eq "10"
   end
 
   it "should build an url, with an offset of 10" do
-    ps = PrimoSearch.new
+    puts Dir.current
+    ps = PrimoSearch.new(config_file: "./spec/config.json")
+
     url, inst, offset, limit = ps.build_url("title:'wandering earth'", {"from" => "10", "step" => "1"})
 
     offset.should eq "10"
@@ -43,13 +46,16 @@ describe Search do
   end
 
   it "should execute a query" do
-    ps = PrimoSearch.new
-    result = ps.query("title:'wandering earth'", {"step" => "1"})
+    puts Dir.current
+    ps = PrimoSearch.new(config_file: "./spec/config.json")
 
-    result["step"].should eq "1"
-    result["from"].should eq "0"
-    result["to"].should eq "1"
-    result["data"].should_not be_nil
+    result = ps.query("title:'wandering earth'", {"step" => "1"})
+    
+    #invalid key
+    result.to_h["code"].should eq "400"
+    # result["from"].should eq "0"
+    # result["to"].should eq "1"
+    # result["data"].should_not be_nil
   end
 
 end

@@ -2,39 +2,18 @@ require "./generic_search"
 require "uri"
 
 class PrimoSearch < GenericSearch    
-  @lds_mapping = {
-    "lds01" => "other_title",
-    "lds02" => "event",
-    "lds03" => "genre_form",
-    "lds04" => "abstract",
-    "lds05" => "original_version",
-    "lds06" => "target_audience",
-    "lds07" => "HACK_GENRE_FORM",
-    "lds08" => "HACK_CREATOR",
-    "lds09" => "HACK_TITLE",
-    "lds10" => "from_relationship",
-    "lds11" => "to_relationship",
-    "lds12" => "publication_status",
-    "lds13" => "ref_code",
-    "lds14" => Hash{"lirias" => "lirias_code", "kadoc" => "ref_code"},
-    "lds15" => "subjects",
-    "lds16" => "number_of_players",
-    "lds19" => "unknown",
-    "lds20" => Hash{"kul" => "up_link", "kadoc" => "parent_id", "mplus" => "records_id"},
-    "lds21" => "996",
-    "lds22" => "publisher",
-    "lds23" => "breadcrumbs",
-    "lds24" => "source_type",
-    "lds30" => "virtual_collection",
-    "lds31" => "local_subjects",
-    "lds35" => "related_records",
-    "lds50" => "peer_reviewed"
-  }
 
+  def initialize(@logger : Logger = Logger.new(STDOUT), @config_file : String ="config.json")
+  end
+  
   def config
-    JSON.parse(File.read("config.json"))["engines"]["primo"].as_h
+    JSON.parse(File.read(@config_file))["engines"]["primo"].as_h
   rescue e
     raise "Unable to load or parse config.json"
+  end
+
+  def lds_mapping
+    config["local_display"].as_h
   end
 
   def index_map
@@ -130,12 +109,12 @@ class PrimoSearch < GenericSearch
   end
 
   private def do_lds_mapping(k, inst)
-    if @lds_mapping.has_key?(k)
-      lk = @lds_mapping[k]
+    if lds_mapping.has_key?(k)
+      lk = lds_mapping[k]
       if lk.is_a?(Hash)
         k = lk.fetch(inst.downcase, "source_id")
       else
-        k = lk
+        k = lk.as_s
       end
     end
 

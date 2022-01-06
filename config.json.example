@@ -1,0 +1,96 @@
+{
+    "engines": {
+        "primo": {
+            "index": {
+                "acq_date": "acq_date",
+                "acq_local": "acq_local",
+                "acq_tag": "acq_tag",
+                "acq_method": "acq_method",
+                "acq_source": "acq_source",
+                "any": "any",
+                "lang": "facet_lang",
+                "author": "creator",
+                "available_in": "lsr02",
+                "callnumber": "callnumber",
+                "category_type": "lsr01",
+                "collection": "lsr04",
+                "isbn": "isbn",
+                "issn": "issn",
+                "library": "facet_library",
+                "resource_type": "facet_rtype",
+                "pre_filter": "facet_pfilter",
+                "scope": "scope",
+                "source": "facet_domain",
+                "subject": "sub",
+                "sys": "rid",
+                "tag": "usertag",
+                "title": "title",
+                "topic": "facet_topic",
+                "toplevel": "facet_tlevel",
+                "year": "facet_creationdate",
+                "vcollection": "facet_local14",
+                "atoz": "facet_atoz",
+                "user": "lsr09",
+                "sresource_type": "facet_local16",
+                "genre": "facet_genre",
+                "status": "facet_local12"
+            },
+            "local_display": {
+                "lds01": "other_title",
+                "lds02": "event",
+                "lds03": "genre_form",
+                "lds04": "abstract",
+                "lds05": "original_version",
+                "lds06": "target_audience",
+                "lds07": "HACK_GENRE_FORM",
+                "lds08": "HACK_CREATOR",
+                "lds09": "HACK_TITLE",
+                "lds10": "from_relationship",
+                "lds11": "to_relationship",
+                "lds12": "publication_status",
+                "lds13": "ref_code",
+                "lds14": {
+                    "lirias": "lirias_code",
+                    "kadoc": "ref_code"
+                },
+                "lds15": "subjects",
+                "lds16": "number_of_players",
+                "lds19": "unknown",
+                "lds20": {
+                    "kul": "up_link",
+                    "kadoc": "parent_id",
+                    "mplus": "records_id"
+                },
+                "lds21": "996",
+                "lds22": "publisher",
+                "lds23": "breadcrumbs",
+                "lds24": "source_type",
+                "lds30": "virtual_collection",
+                "lds31": "local_subjects",
+                "lds35": "related_records",
+                "lds50": "peer_reviewed"
+            },
+            "institution": {
+                "lirias": {
+                    "vid": "Lirias",
+                    "tab": "default_tab",
+                    "scope": "Lirias"
+                },
+                "kul": {
+                    "vid": "KULeuven",
+                    "tab": "all_content_tab",
+                    "scope": "ALL_CONTENT"
+                },
+                "doks": {
+                    "vid": "DOKS",
+                    "tab": "doks_tab",
+                    "scope": "DOKS"
+                }
+            },
+            "alma": {
+                "host": "api-eu.hosted.exlibrisgroup.com",
+                "apikey": "l7xxaa2ca915ae4d46e299c9ca4348f179a8"
+            }
+        }
+    }
+}
