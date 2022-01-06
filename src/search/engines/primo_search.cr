@@ -111,12 +111,22 @@ class PrimoSearch < GenericSearch
   private def do_lds_mapping(k, inst)
     if lds_mapping.has_key?(k)
       lk = lds_mapping[k]
-      if lk.is_a?(Hash)
+      #if lk.is_a?(Hash)
+      if lk.is_a?(JSON::Any)
+        if lk.raw.is_a?(Hash)
+          k = lk.as_h.fetch(inst.downcase, "source_id")
+          k = k.as_s if k.is_a?(JSON::Any)
+        else
+          k = lk.as_s
+        end
+      elsif lk.is_a?(Hash)
         k = lk.fetch(inst.downcase, "source_id")
       else
         k = lk
       end
     end
+
+    puts "----> #{k}"
 
     k
   end
@@ -124,14 +134,14 @@ class PrimoSearch < GenericSearch
   private def extract_pnx(raw : JSON::Any, section : String, inst : String)
     pnx = raw.as_h
     # section_result = [] of String | Hash(String, String)
-    section_result = {} of String => Array(String | Hash(String, String))
+    section_result = {} of String => Array(String | Hash(String, String))    
 
     pnx[section].as_h.each do |k, v|
       if section == "display"
         k = do_lds_mapping(k, inst)
       end
 
-      section_result[k] = [] of String | Hash(String, String) unless section_result.has_key?(k)
+      section_result[k] = [] of String | Hash(String, String) unless section_result.has_key?(k)      
 
       v = v.as_a
       v.each do |vdata|
