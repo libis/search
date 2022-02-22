@@ -53,7 +53,16 @@ class PrimoSearch < GenericSearch
 
     host = alma["host"]
     offset = options.has_key?("from") ? options["from"] : "0"
+    if offset.to_i < 0 
+      offset = "0"
+    end
+
     limit = options.has_key?("step") ? options["step"] : "10"
+
+    if limit.to_i > 100
+      limit = "100"
+    end
+    
     inst = options.has_key?("institution") ? options["institution"] : "KUL"
     sort = options.has_key?("sort") ? options["sort"] : "rank"
     apikey = options.has_key?("apikey") ? options["apikey"] : alma["apikey"]
