@@ -52,9 +52,9 @@ class PrimoSearch < GenericSearch
     end
 
     host = alma["host"]
-    offset = options.has_key?("from") ? options["from"] : "0"
-    if offset.to_i < 0 
-      offset = "0"
+    offset = options.has_key?("from") ? options["from"] : "1"
+    if offset.to_i < 1
+      offset = "1"
     end
 
     limit = options.has_key?("step") ? options["step"] : "10"
@@ -75,7 +75,8 @@ class PrimoSearch < GenericSearch
 
     facets = facet.size > 0 ? "&qInclude=#{URI.encode_path(facet)}" : ""
     
-    url = "https://#{host}/primo/v1/search?q=#{URI.encode_path(query)}#{facets}&offset=#{offset}&limit=#{limit}&inst=#{inst}&vid=#{vid}&tab=#{tab}&scope=#{scope}&sort=#{sort}&apikey=#{apikey}"
+    url = "https://#{host}/primo/v1/search?q=#{URI.encode_path(query)}#{facets}&offset=#{offset}&limit=#{limit}&vid=#{vid}&tab=#{tab}&scope=#{scope}&sort=#{sort}&apikey=#{apikey}"
+    #url = "https://#{host}/primo/v1/search?q=#{URI.encode_path(query)}#{facets}&offset=#{offset}&limit=#{limit}&inst=#{inst}&vid=#{vid}&tab=#{tab}&scope=#{scope}&sort=#{sort}&apikey=#{apikey}"
     @logger.info(url)
     [url, inst, offset, limit]
   rescue e
