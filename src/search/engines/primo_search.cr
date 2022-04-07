@@ -1,6 +1,7 @@
 require "./generic_search"
 require "uri"
 require "json"
+require "yaml"
 
 class PrimoSearch < GenericSearch    
 
@@ -8,27 +9,28 @@ class PrimoSearch < GenericSearch
   end
   
   def config
-    Hash(String, Hash(String, Hash(String, Hash(String, String | Hash(String, String))) ) ).from_json(File.read(@config_file))["engines"]["primo"]
+    JSON.parse(File.read(@config_file))["engines"]["primo"]
+    #Hash(String, Hash(String, Hash(String, Hash(String, String | Hash(String, String))) ) ).from_json(File.read(@config_file))["engines"]["primo"]
   rescue e
     raise "Unable to load or parse config.json"
   end
 
   def lds_mapping
-    config["local_display"]
+    config["local_display"].as_h
   end
 
   def index_map
-    config["index"]
+    config["index"].as_h
   rescue e
     raise "Unable to get index_map from config.json"
   end
 
   def avail_inst
-    config["institution"]
+    config["institution"].as_h
   end
 
-  def alma
-    config["alma"]
+  def alma         
+    avail_inst.fetch("kul", avail_inst["kul"])["alma"].as_h    
   end
 
 
@@ -51,7 +53,6 @@ class PrimoSearch < GenericSearch
       raise e
     end
 
-    host = alma["host"]
     offset = options.has_key?("from") ? options["from"] : "1"
     if offset.to_i < 1
       offset = "1"
@@ -63,15 +64,16 @@ class PrimoSearch < GenericSearch
       limit = "100"
     end
     
-    inst = options.has_key?("institution") ? options["institution"] : "KUL"
+    inst = options.has_key?("institution") ? options["institution"] : "KUL"    
     sort = options.has_key?("sort") ? options["sort"] : "rank"
-    apikey = options.has_key?("apikey") ? options["apikey"] : alma["apikey"]
-
+    
     a_inst = avail_inst.fetch(inst.downcase, avail_inst["kul"])
-
+    apikey = options.has_key?("apikey") ? options["apikey"] : a_inst["alma"]["apikey"]
+    host = a_inst["alma"]["host"]
     vid = a_inst["vid"]
     tab = a_inst["tab"]
     scope = a_inst["scope"]
+    
 
     facets = facet.size > 0 ? "&qInclude=#{URI.encode_path(facet)}" : ""
     

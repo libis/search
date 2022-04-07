@@ -69,7 +69,7 @@ module Query
       end
     end
 
-    def initialize(@index_map = {} of String => Hash(String, String) | String)
+    def initialize(@index_map : Hash(String, JSON::Any))
       @open_bracket = 0
       @close_bracket = 0
     end
@@ -91,7 +91,7 @@ module Query
             raise "query error: brackets do not match"
           end
           query = Query.new(index: "any", match: MatchType::Contains, terms: [] of Term)
-          query.index = @index_map.includes?(token.rchop) ? token.rchop : "any"
+          query.index = @index_map.has_key?(token.rchop) ? token.rchop : "any"
         elsif is_operator?(token)
           query.terms << Term.new(TermType::Operator, token, Bracket.new("", ""))
         elsif is_term?(token)
@@ -178,9 +178,9 @@ module Query
       query.split(" ")
     end
 
-    private def is_index?(possible_index)
+    private def is_index?(possible_index)      
       if possible_index[-1] == ':'
-        return @index_map.includes?(possible_index.rchop)
+        return @index_map.has_key?(possible_index.rchop)
       end
       return false
     rescue e

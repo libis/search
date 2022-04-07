@@ -35,7 +35,7 @@ describe Search do
     
     stringified = parsed.map{|m| m.to_s}
     stringified[0].should eq "user,contains,U0011315"
-    stringified[1].should eq "user,contains,U0011315"
+    stringified[1].should eq "year,contains,[2010 TO 2022]"
   end
 
   it "should build an url, default options" do
@@ -43,9 +43,10 @@ describe Search do
     ps = PrimoSearch.new(config_file: "./spec/config.json")
     url, inst, offset, limit = ps.build_url("title:'wandering earth'")
 
-    url.should eq "https://#{ps.alma["host"]}/primo/v1/search?q=title%2Cexact%2C%27wandering%20earth%27&offset=0&limit=10&inst=KUL&vid=KULeuven&tab=all_content_tab&scope=ALL_CONTENT&sort=rank&apikey=#{ps.alma["apikey"]}"
+    #url.should eq "https://#{ps.alma["host"]}/primo/v1/search?q=title%2Cexact%2C%27wandering%20earth%27&offset=0&limit=10&inst=KUL&vid=KULeuven&tab=all_content_tab&scope=ALL_CONTENT&sort=rank&apikey=#{ps.alma["apikey"]}"    
+    url.should eq "https://#{ps.alma["host"]}/primo/v1/search?q=title%2Cexact%2C%27wandering%20earth%27&offset=1&limit=10&vid=KULeuven&tab=all_content_tab&scope=ALL_CONTENT&sort=rank&apikey=#{ps.alma["apikey"]}"
     inst.should eq "KUL"
-    offset.should eq "0"
+    offset.should eq "1"
     limit.should eq "10"
   end
 

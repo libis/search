@@ -74,22 +74,30 @@
                 "lirias": {
                     "vid": "Lirias",
                     "tab": "default_tab",
-                    "scope": "Lirias"
+                    "scope": "Lirias",
+                    "alma": {
+                        "host": "api-eu.hosted.exlibrisgroup.com",
+                        "apikey": "YOUR_API_KEY"
+                    }                    
                 },
                 "kul": {
                     "vid": "KULeuven",
                     "tab": "all_content_tab",
-                    "scope": "ALL_CONTENT"
+                    "scope": "ALL_CONTENT",
+                    "alma": {
+                        "host": "api-eu.hosted.exlibrisgroup.com",
+                        "apikey": "YOUR_API_KEY"
+                    }                    
                 },
                 "doks": {
                     "vid": "DOKS",
                     "tab": "doks_tab",
-                    "scope": "DOKS"
+                    "scope": "DOKS",
+                    "alma": {
+                        "host": "api-eu.hosted.exlibrisgroup.com",
+                        "apikey": "YOUR_API_KEY"
+                    }                    
                 }
-            },
-            "alma": {
-                "host": "api-eu.hosted.exlibrisgroup.com",
-                "apikey": "YOUR_API_KEY"
             }
         }
     }
