@@ -44,7 +44,7 @@ describe Search do
     url, inst, offset, limit = ps.build_url("title:'wandering earth'")
 
     #url.should eq "https://#{ps.alma["host"]}/primo/v1/search?q=title%2Cexact%2C%27wandering%20earth%27&offset=0&limit=10&inst=KUL&vid=KULeuven&tab=all_content_tab&scope=ALL_CONTENT&sort=rank&apikey=#{ps.alma["apikey"]}"    
-    url.should eq "https://#{ps.alma["host"]}/primo/v1/search?q=title%2Cexact%2C%27wandering%20earth%27&offset=1&limit=10&vid=KULeuven&tab=all_content_tab&scope=ALL_CONTENT&sort=rank&apikey=#{ps.alma["apikey"]}"
+    url.should eq "https://#{ps.alma["host"]}/primo/v1/search?q=title%2Cexact%2C%27wandering%20earth%27&offset=1&limit=10&vid=KULeuven&tab=all_content_tab&scope=ALL_CONTENT&sort=rank&pcAvailability=true&apikey=#{ps.alma["apikey"]}"
     inst.should eq "KUL"
     offset.should eq "1"
     limit.should eq "10"

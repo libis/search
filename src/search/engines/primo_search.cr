@@ -77,7 +77,7 @@ class PrimoSearch < GenericSearch
 
     facets = facet.size > 0 ? "&qInclude=#{URI.encode_path(facet)}" : ""
     
-    url = "https://#{host}/primo/v1/search?q=#{URI.encode_path(query)}#{facets}&offset=#{offset}&limit=#{limit}&vid=#{vid}&tab=#{tab}&scope=#{scope}&sort=#{sort}&apikey=#{apikey}"
+    url = "https://#{host}/primo/v1/search?q=#{URI.encode_path(query)}#{facets}&offset=#{offset}&limit=#{limit}&vid=#{vid}&tab=#{tab}&scope=#{scope}&sort=#{sort}&pcAvailability=true&apikey=#{apikey}"
     #url = "https://#{host}/primo/v1/search?q=#{URI.encode_path(query)}#{facets}&offset=#{offset}&limit=#{limit}&inst=#{inst}&vid=#{vid}&tab=#{tab}&scope=#{scope}&sort=#{sort}&apikey=#{apikey}"
     @logger.info(url)
     [url, inst, offset, limit]
