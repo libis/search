@@ -8,6 +8,6 @@ dependencies:
 authors:
   - Mehmet Celik <mehmet@celik.be>
 
-crystal: 1.3.2
+rrystal: 1.4.1
 
 license: MIT
