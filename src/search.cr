@@ -2,7 +2,7 @@ require "./search/engines/primo_search"
 require "logger"
 
 module Search
-  VERSION = "0.6.0"
+  VERSION = "0.10.0"
 
   class Search
     def initialize(@logger : Logger = Logger.new(STDOUT))
