@@ -1,5 +1,5 @@
 name: search
-version: 0.9.0
+version: 0.10.0
 
 dependencies:
   logger:
@@ -8,6 +8,6 @@ dependencies:
 authors:
   - Mehmet Celik <mehmet@celik.be>
 
-rrystal: 1.4.1
+crystal: 1.5.0
 
 license: MIT
