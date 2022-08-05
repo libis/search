@@ -53,9 +53,9 @@ class PrimoSearch < GenericSearch
       raise e
     end
 
-    offset = options.has_key?("from") ? options["from"] : "1"
-    if offset.to_i < 1
-      offset = "1"
+    offset = options.has_key?("from") ? options["from"] : (config["offset_base"].as_i? || 0).to_s
+    if offset.to_i < config["offset_base"].as_i
+      offset = (config["offset_base"].as_i? || "0").to_s
     end
 
     limit = options.has_key?("step") ? options["step"] : "10"
@@ -77,7 +77,7 @@ class PrimoSearch < GenericSearch
 
     facets = facet.size > 0 ? "&qInclude=#{URI.encode_path(facet)}" : ""
     
-    url = "https://#{host}/primo/v1/search?q=#{URI.encode_path(query)}#{facets}&offset=#{offset}&limit=#{limit}&vid=#{vid}&tab=#{tab}&scope=#{scope}&sort=#{sort}&pcAvailability=true&apikey=#{apikey}"
+    url = "https://#{host}/primo/v1/search?q=#{URI.encode_path(query)}#{facets}&offset=#{offset.to_s}&limit=#{limit}&vid=#{vid}&tab=#{tab}&scope=#{scope}&sort=#{sort}&pcAvailability=true&apikey=#{apikey}"
     #url = "https://#{host}/primo/v1/search?q=#{URI.encode_path(query)}#{facets}&offset=#{offset}&limit=#{limit}&inst=#{inst}&vid=#{vid}&tab=#{tab}&scope=#{scope}&sort=#{sort}&apikey=#{apikey}"
     @logger.info(url)
     [url, inst, offset, limit]
@@ -206,9 +206,10 @@ class PrimoSearch < GenericSearch
     delivery = raw.as_h
     section_result = {} of String => Array(String | Hash(String, String))
 
-    if delivery.has_key?("link")
-      links = delivery["link"].as_a
+    if delivery.has_key?("link")      
+      links = delivery["link"].as_a?
 
+      links = [] of JSON::Any if links.nil?
       links.each do |link|
         link_label = link["displayLabel"].as_s
         link_url = link["linkURL"].as_s
