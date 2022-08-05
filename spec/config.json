@@ -72,31 +72,22 @@
             },
             "institution": {
                 "lirias": {
-                    "vid": "Lirias",
-                    "tab": "default_tab",
-                    "scope": "Lirias",
+                    "vid": "32KUL_KUL:Lirias",
+                    "tab": "LIRIAS",
+                    "scope": "lirias_profile",
                     "alma": {
                         "host": "api-eu.hosted.exlibrisgroup.com",
-                        "apikey": "YOUR_API_KEY"
-                    }                    
+                        "apikey": "l8xx316ccb516e0448e595dd76fa6a589a1a"
+                    }
                 },
                 "kul": {
-                    "vid": "KULeuven",
-                    "tab": "all_content_tab",
-                    "scope": "ALL_CONTENT",
+                    "vid": "32KUL_KUL:KULeuven",
+                    "tab": "default_tab",
+                    "scope": "default_scope",
                     "alma": {
                         "host": "api-eu.hosted.exlibrisgroup.com",
-                        "apikey": "YOUR_API_KEY"
-                    }                    
-                },
-                "doks": {
-                    "vid": "DOKS",
-                    "tab": "doks_tab",
-                    "scope": "DOKS",
-                    "alma": {
-                        "host": "api-eu.hosted.exlibrisgroup.com",
-                        "apikey": "YOUR_API_KEY"
-                    }                    
+                        "apikey": "l7xxaa2ca915ae4d46e299c9ca4348f179a8"
+                    }
                 }
             }
         }

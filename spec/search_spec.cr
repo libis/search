@@ -43,8 +43,8 @@ describe Search do
     ps = PrimoSearch.new(config_file: "./spec/config.json")
     url, inst, offset, limit = ps.build_url("title:'wandering earth'")
 
-    #url.should eq "https://#{ps.alma["host"]}/primo/v1/search?q=title%2Cexact%2C%27wandering%20earth%27&offset=0&limit=10&inst=KUL&vid=KULeuven&tab=all_content_tab&scope=ALL_CONTENT&sort=rank&apikey=#{ps.alma["apikey"]}"    
-    url.should eq "https://#{ps.alma["host"]}/primo/v1/search?q=title%2Cexact%2C%27wandering%20earth%27&offset=1&limit=10&vid=KULeuven&tab=all_content_tab&scope=ALL_CONTENT&sort=rank&pcAvailability=true&apikey=#{ps.alma["apikey"]}"
+    #https://api-eu.hosted.exlibrisgroup.com/primo/v1/search?q=title%2Cexact%2C%27wandering%20earth%27&offset=1&limit=10&vid=32KUL_KUL:KULeuven&tab=default_tab&scope=default_scope&sort=rank&pcAvailability=true&apikey=l7xxaa2ca915ae4d46e299c9ca4348f179a8
+    url.should eq "https://#{ps.alma["host"]}/primo/v1/search?q=title%2Cexact%2C%27wandering%20earth%27&offset=1&limit=10&vid=32KUL_KUL:KULeuven&tab=default_tab&scope=default_scope&sort=rank&pcAvailability=true&apikey=#{ps.alma["apikey"]}"
     inst.should eq "KUL"
     offset.should eq "1"
     limit.should eq "10"
@@ -63,13 +63,25 @@ describe Search do
     
     ps = PrimoSearch.new(config_file: "./spec/config.json")
 
-    result = ps.query("title:'wandering earth'", {"step" => "1"})
+    result = ps.query("title:'wandering earth'", {"step" => "10"})
     
+    pp result
+
     #invalid key
-    result.to_h["code"].should eq "400"
-    # result["from"].should eq "0"
-    # result["to"].should eq "1"
-    # result["data"].should_not be_nil
+    # result.to_h["code"].should eq "400"
+     result["from"].should eq "1"
+     result["to"].should eq result["count"]
+     result["data"].should_not be_nil
+
+    #pp result["data"]
+  end
+
+  it "should search for isbn" do
+    ps = PrimoSearch.new(config_file: "./spec/config.json")
+
+    result = ps.query("isbn:1-56881-177-2", {"step" => "10", "institution" => "lirias"})
+
+    pp result
   end
 
 end

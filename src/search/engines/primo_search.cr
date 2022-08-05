@@ -91,7 +91,7 @@ class PrimoSearch < GenericSearch
       response = HTTP::Client.get(url)
       if response.status_code == 200
         data = JSON.parse(response.body)
-        count = data["info"]["total"].as_i?
+        count = data["info"]["total"].as_i? || 0
 
         docs = data["docs"].as_a.map do |m|
           result = {} of String => Hash(String, Array(String | Hash(String, String))) | String
@@ -107,9 +107,12 @@ class PrimoSearch < GenericSearch
           result.to_h
         end
 
+        to_count = (offset.to_i + limit.to_i)
+        to_count = count if count < to_count
+
         return {count: count.to_s,
                 from: offset.to_s,
-                to: (offset.to_i + limit.to_i).to_s,
+                to: to_count.to_s,
                 step: limit.to_s,
                 data: docs}
         # return data
