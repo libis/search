@@ -162,7 +162,7 @@ class PrimoSearch < GenericSearch
         if vdata.as_i?
           sdata = vdata.as_i.to_s
         else
-          sdata = vdata.as_s
+          sdata = vdata.as_s? || ""
         end
 
         if sdata =~ /^\$\$([[:upper:]])/

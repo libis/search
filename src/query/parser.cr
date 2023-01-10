@@ -19,6 +19,12 @@ module Query
       Exact
     end
 
+    enum OperatorType
+      AND
+      OR
+      NOT
+    end
+
     enum TermType
       Term
       Operator
@@ -49,23 +55,31 @@ module Query
       property index : String
       property match : MatchType
       property terms : Array(Term)
+      property operator : OperatorType
 
-      def initialize(@index : String, @match : MatchType, @terms : Array(Term))
+      def initialize(@index : String, @match : MatchType, @terms : Array(Term), @operator : OperatorType = OperatorType::AND)
       end
 
       def to_s
         terms_s = ""
         @terms.each do |term|
           if @terms.last == term && term.type == TermType::Operator
-            terms_s += "," if terms_s.size > 0
+            #terms_s += "," if terms_s.size > 0
+            case term.to_s          
+            when "OR"
+              @operator = OperatorType::OR
+            when "NOT"
+              @operator = OperatorType::NOT
+            else
+              @operator = OperatorType::AND
+            end
           else
-            terms_s += " " if terms_s.size > 0
+            terms_s += " " if terms_s.size > 0 && /\[\]\'\"\(\)/ !~ term
+            terms_s += term.to_s
           end
-
-          terms_s += term.to_s
         end
-
-        "#{@index},#{underscore(@match.to_s)},#{terms_s.rchop(" ")}"
+        
+        "#{@index},#{underscore(@match.to_s)},#{terms_s.rchop(" ")},#{@operator}"
       end
     end
 
@@ -76,24 +90,23 @@ module Query
 
     def parse(query)
       tokens = tokenize(query)
-
       queries = [] of Query
 
-      query = Query.new(index: "any", match: MatchType::Contains, terms: [] of Term)
+      query = Query.new(index: "any", match: MatchType::Contains, terms: [] of Term, operator: OperatorType::AND)
       tokens.each do |token|
         next if token.blank?
-        
+
         if is_index?(token)
           if @open_bracket == @close_bracket
             query.terms = cleanup_query_term(query.terms)
             queries << query unless query.terms.empty?
           else
-            raise "query error: brackets do not match"
+            raise "query error: brackets do not match #{@open_bracket}, #{@close_bracket}"
           end
-          query = Query.new(index: "any", match: MatchType::Contains, terms: [] of Term)
+          query = Query.new(index: "any", match: MatchType::Contains, terms: [] of Term, operator: OperatorType::AND)
           query.index = @index_map.has_key?(token.rchop) ? token.rchop : "any"
         elsif is_operator?(token)
-          query.terms << Term.new(TermType::Operator, token, Bracket.new("", ""))
+          query.terms << Term.new(TermType::Operator, token, Bracket.new("", ""))          
         elsif is_term?(token)
           if token[0] == '^'
             query.match = MatchType::BeginsWith
@@ -126,13 +139,29 @@ module Query
 
     private def collapse_if_exact_match(queries : Array(Query))
       new_queries = [] of Query
+      # new_terms = [] of Term
+
+      # buffer = ""
+      # query.terms.each do |t|
+      #   if t.value =~ /^["|']/
+      #     buffer = t.value
+      #   else
+      #     buffer = ""
+      #   end
+      #   if buffer.empty?
+      #     new_terms << Term.new(type: t.type value: "#{buffer}#{t.value}" brackets: t.brackets)
+      #   end
+      # end
+
       queries.each do |query|
         if query.terms.first.value =~ /^["|']/ && query.terms.last.value =~ /["|']$/
+          new_terms = [] of Term
           new_queries << Query.new(index: query.index,
             match: MatchType::Exact,
             terms: [Term.new(TermType::Term,
                       query.terms.map { |m| m.value }.join(" "),
-                      Bracket.new("", ""))]
+                      Bracket.new("", ""))],
+            operator: OperatorType::AND
           )
         else
           new_queries << query
@@ -174,8 +203,8 @@ module Query
     private def tokenize(query : String)
       # query = query.encode("UTF-8", invalid: :replace)
       query = query.gsub(/\b *?: *?/, ": ") # remove
-      query = query.gsub(/ {1,}/, " ")
-      query.split(" ")
+      query = query.gsub(/ {1,}/, " ")      
+      query.scan(/\w+:?|\W/).map{|m| m[0]}
     end
 
     private def is_index?(possible_index)      
@@ -199,7 +228,7 @@ module Query
     end
 
     private def is_operator?(possible_operator)
-      operators = %w(AND OR NOT)
+      operators = OperatorType.names
       operators.includes?(possible_operator)
     rescue e
       return false      

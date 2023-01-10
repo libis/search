@@ -10,12 +10,12 @@ describe Search do
     parsed = qp.parse("pre_filter:(images OR books) AND title:postkaart OR subject:^postkaart")
 
     stringified = parsed.map{|m| m.to_s}
-    stringified[0].should eq "pre_filter,contains,(images OR books),AND"
+    stringified[0].should eq "pre_filter,contains,( images OR books ),AND"
     stringified[1].should eq "title,contains,postkaart,OR"
-    stringified[2].should eq "subject,begins_with,postkaart"
+    stringified[2].should eq "subject,begins_with,postkaart,AND"
   end
 
-  it "should parse query" do
+  it "should parse query 'wandering earth'" do
     ps = PrimoSearch.new(config_file: "./spec/config.json")
     qp = Query::Parser.new(ps.index_map)
 
@@ -23,19 +23,19 @@ describe Search do
     #pp parsed
 
     stringified = parsed.map{|m| m.to_s}
-    stringified[0].should eq "title,exact,'wandering earth'"
+    stringified[0].should eq "title,exact,' wandering earth ',AND"
   end
 
 
-  it "should parse query" do
+  it "should parse query 'user/year'" do
     ps = PrimoSearch.new(config_file: "./spec/config.json")
     qp = Query::Parser.new(ps.index_map)
 
     parsed = qp.parse("user:U0011315 year:[2010 TO 2022]")
     
     stringified = parsed.map{|m| m.to_s}
-    stringified[0].should eq "user,contains,U0011315"
-    stringified[1].should eq "year,contains,[2010 TO 2022]"
+    stringified[0].should eq "user,contains,U0011315,AND"
+    stringified[1].should eq "year,contains,[ 2010 TO 2022 ],AND"
   end
 
   it "should build an url, default options" do
@@ -43,8 +43,8 @@ describe Search do
     ps = PrimoSearch.new(config_file: "./spec/config.json")
     url, inst, offset, limit = ps.build_url("title:'wandering earth'")
 
-    #https://api-eu.hosted.exlibrisgroup.com/primo/v1/search?q=title%2Cexact%2C%27wandering%20earth%27&offset=1&limit=10&vid=32KUL_KUL:KULeuven&tab=default_tab&scope=default_scope&sort=rank&pcAvailability=true&apikey=l7xxaa2ca915ae4d46e299c9ca4348f179a8
-    url.should eq "https://#{ps.alma["host"]}/primo/v1/search?q=title%2Cexact%2C%27wandering%20earth%27&offset=0&limit=10&vid=32KUL_KUL:KULeuven&tab=default_tab&scope=default_scope&sort=rank&pcAvailability=true&apikey=#{ps.alma["apikey"]}"
+    url.should eq "https://#{ps.alma["host"]}/primo/v1/search?q=title%2Cexact%2C%27%20wandering%20earth%20%27%2CAND&offset=0&limit=10&vid=32KUL_KUL:KULeuven&tab=default_tab&scope=default_scope&sort=rank&pcAvailability=true&apikey=#{ps.alma["apikey"]}"
+    #url.should eq "https://#{ps.alma["host"]}/primo/v1/search?q=title%2Cexact%2C%27wandering%20earth%27%2CAND&offset=0&limit=10&vid=32KUL_KUL:KULeuven&tab=default_tab&scope=default_scope&sort=rank&pcAvailability=true&apikey=#{ps.alma["apikey"]}"
     inst.should eq "KUL"
     offset.should eq "0"
     limit.should eq "10"
@@ -79,7 +79,25 @@ describe Search do
 
     result = ps.query("isbn:1-56881-177-2", {"step" => "10", "institution" => "lirias"})
 
-    pp result[:data]
+    result[:data].should_not be_nil 
+    result[:data].should_not be_empty 
+  end
+
+  it "should parse a query with an implicit operator" do
+    ps = PrimoSearch.new(config_file: "./spec/config.json")
+    qp = Query::Parser.new(ps.index_map)
+
+    query = "title:water subject:(oil OR vinegar)"
+
+    parsed = qp.parse(query)    
+
+    result = ps.query(query, {"step" => "10", "institution" => "lirias"})
+
+    stringified = parsed.map{|m| m.to_s}
+    
+    stringified[0].should eq "title,contains,water,AND"
+    stringified[1].should eq "subject,contains,( oil OR vinegar ),AND"
+
   end
 
 end
