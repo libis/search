@@ -47,7 +47,8 @@ module Query
       end
 
       def to_s
-        "#{@brackets.open}#{@value}#{@brackets.close}"
+        #"#{@brackets.open}#{@value}#{@brackets.close}"
+        "#{@brackets.open}#{@value.rchop(" ").gsub(/ +/,' ')}#{@brackets.close}"
       end
     end
 
@@ -74,11 +75,13 @@ module Query
               @operator = OperatorType::AND
             end
           else
-            terms_s += " " if terms_s.size > 0 && /\[\]\'\"\(\)/ !~ term
+            #terms_s += " " if terms_s.size > 0 && /\[\]\'\"\(\)/ !~ term
+            terms_s += " " if terms_s.size > 0 && (/[ \W]$/ !~ terms_s && /^[ \W]/ !~ term.value)
             terms_s += term.to_s
           end
         end
         
+        terms_s = terms_s.rchop(" ").gsub(/ +/,' ')
         "#{@index},#{underscore(@match.to_s)},#{terms_s.rchop(" ")},#{@operator}"
       end
     end
@@ -154,7 +157,8 @@ module Query
       # end
 
       queries.each do |query|
-        if query.terms.first.value =~ /^["|']/ && query.terms.last.value =~ /["|']$/
+        #if query.terms.first.value =~ /^["|'-]/ && query.terms.last.value =~ /["|'-]$/
+        if query.terms.first.value =~ /^\W/ && query.terms.last.value =~ /\W$/  
           new_terms = [] of Term
           new_queries << Query.new(index: query.index,
             match: MatchType::Exact,
@@ -204,7 +208,8 @@ module Query
       # query = query.encode("UTF-8", invalid: :replace)
       query = query.gsub(/\b *?: *?/, ": ") # remove
       query = query.gsub(/ {1,}/, " ")      
-      query.scan(/\w+:?|\W/).map{|m| m[0]}
+      #query.scan(/\w+:?|\W/).map{|m| m[0]}
+      query.scan(/(\w+(?=:)?)\W?|\W/).map { |m| m[0] }
     end
 
     private def is_index?(possible_index)      
